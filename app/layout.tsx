@@ -1,4 +1,24 @@
-import './globals.css';
+import './styles/config.css';
+import './styles/global.css';
+import './styles/animations.css';
+
+import './styles/background.css';
+import './styles/desktopWindow.css';
+
+import './styles/Components/volumeSlider.css';
+import './styles/Components/taskbar.css';
+import './styles/Components/widgets.css';
+import './styles/Components/quickAccess.css';
+import './styles/Components/modal.css';
+import './styles/Components/tooltip.css';
+import './styles/Components/imageViewer.css';
+import './styles/Components/windows.css';
+import './styles/Widgets/musicPlayer.css';
+
+import './styles/Applications/about.css';
+import './styles/Applications/gallery.css';
+import './styles/Applications/stuff.css';
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from "next/font/google";
 import { Itim, Pixelify_Sans } from "next/font/google";

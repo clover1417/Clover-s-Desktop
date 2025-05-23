@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { bringToFront, sendToBack, getZIndex, registerWindow } from '../utils/windowManager';
 
 interface ModalProps {
   isOpen: boolean;
@@ -18,8 +19,43 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+  const [zIndex, setZIndex] = useState(1);
   const modalRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Store reference to the close function to avoid stale closures
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+  
+  // Reset position to center
+  const resetPosition = () => {
+    setPosition({ x: 0, y: 0 });
+    console.log('Modal position reset');
+  };
+  
+  // Handle closing with animation - using simpler approach
+  const handleClose = () => {
+    // Set state to trigger animation, but don't change position
+    if (isOpen) {
+      // Maintain current position but trigger closing animation via CSS
+      setIsAnimating(true);
+      onCloseRef.current();
+    }
+  };
+  
+  // Register with the window manager
+  useEffect(() => {
+    registerWindow('modal', {
+      onClose: () => {
+        // When closed from outside (e.g., return button), ensure animation state is set
+        setIsAnimating(true);
+        onCloseRef.current();
+      },
+      onReset: resetPosition
+    });
+  }, []);
   
   // Handle client-side mounting
   useEffect(() => {
@@ -36,9 +72,14 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
     
     if (isOpen) {
       setIsAnimating(true);
+      // Only reset position when opening, not when closing
       setPosition({ x: 0, y: 0 });
+      
+      // Bring to front when opened
+      setZIndex(bringToFront('modal'));
     } else if (isAnimating) {
       // When closing, wait for animation to complete
+      // Do NOT reset position when closing to avoid teleportation
       animationTimeoutRef.current = setTimeout(() => {
         setIsAnimating(false);
       }, 300); // Match animation duration
@@ -63,6 +104,12 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isOpen || !modalRef.current) return;
+    
+    // Bring window to front when grabbed
+    setZIndex(bringToFront('modal'));
+    if (modalRef.current) {
+      modalRef.current.style.zIndex = '2';
+    }
     
     setIsDragging(true);
     
@@ -114,6 +161,24 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
     };
   }, [isDragging, dragStart]);
 
+  // Add a side effect to listen for external z-index changes
+  useEffect(() => {
+    const updateZIndexInterval = setInterval(() => {
+      if (isOpen && modalRef.current) {
+        const newZIndex = getZIndex('modal');
+        if (newZIndex !== zIndex) {
+          setZIndex(newZIndex);
+          modalRef.current.style.zIndex = newZIndex.toString();
+        }
+      }
+    }, 100); // Check every 100ms
+    
+    return () => clearInterval(updateZIndexInterval);
+  }, [isOpen, zIndex]);
+
+  // Use a controlled approach for animation classes
+  const modalClassName = `modal-container ${isOpen ? 'modal-show' : ''}`;
+
   // Don't render anything if modal is closed and not animating
   if (!isOpen && !isAnimating || !mounted) return null;
 
@@ -127,7 +192,7 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
         top: `calc(50% + ${position.y}px)`,
         left: `calc(50% + ${position.x}px)`,
         transform: 'translate(-50%, -50%)',
-        zIndex: 10000
+        zIndex: zIndex
       }}
     >
       <div 
@@ -152,7 +217,7 @@ export function Modal({ isOpen, onClose, onConfirm, title, message, destination 
           className="modal-button cancel-button"
           onClick={onClose}
         >
-          Nvm.
+          Nope
         </button>
       </div>
     </div>

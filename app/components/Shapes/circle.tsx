@@ -19,7 +19,6 @@ export function Circle({
         position: 'absolute',
         top: top,
         left: left,
-        zIndex: 2,
       }}
     >
       <div

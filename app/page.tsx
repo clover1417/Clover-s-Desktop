@@ -1,31 +1,34 @@
 "use client";
 
 import React from 'react';
-import { Triangle } from '@/app/components/triangle';
-import { Plus } from '@/app/components/plus';
-import { Circle } from '@/app/components/circle';
+import { Triangle } from '@/app/components/Shapes/triangle';
+import { Plus } from '@/app/components/Shapes/plus';
+import { Circle } from '@/app/components/Shapes/circle';
 import { Window } from '@/app/components/Window';
-import { AppIcon } from '@/app/components/AppIcon';
-import { Widget } from '@/app/components/Widget';
+import { AppIcon } from '@/app/components/ApplicationWindows/AppIcon';
+import { Widget } from '@/app/components/Widgets/Widget';
+import { MusicPlayer } from '@/app/components/Widgets/MusicPlayer';
 import { QuickAccess } from '@/app/components/QuickAccess';
+import { VolumeProvider } from '@/app/context/VolumeContext';
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main>
-      <div className='sm:hidden'>
-        
-      </div>
-      <div className="inner-box" />
-      <div className="logo-container">
-        <Image
-          src="/assets/LogoNoShadow.png"
-          alt="Clover Logo"
-          width={440}
-          height={249}
-          priority
-        />
-      </div>
+    <VolumeProvider>
+      <main style={{ zIndex: 0 }}>
+        <div className='sm:hidden'>
+          
+        </div>
+        <div className="inner-box" />
+        <div className="logo-container">
+          <Image
+            src="/assets/LogoNoShadow.png"
+            alt="Clover Logo"
+            width={440}
+            height={249}
+            priority
+          />
+        </div>
 
       <div className="pattern-container">
         <div className="top-nav" />
@@ -74,9 +77,9 @@ export default function Home() {
           {/* Desktop icons */}
           <div className="app-icon-container">
             <AppIcon name="about" icon="About" top="5px" left="20px" />
-            <AppIcon name="resources" icon="Resource" top="5px" left="80px" />
+            <AppIcon name="patreon" icon="Resource" top="5px" left="80px" />
             <AppIcon name="works" icon="Works" top="70px" left="20px" />
-            <AppIcon name="media" icon="Media" top="70px" left="80px" />
+            <AppIcon name="wiki" icon="Wiki" top="70px" left="80px" />
             <AppIcon name="gallery" icon="Gallery" top="135px" left="20px" />
             <AppIcon name="stuff" icon="Stuff" top="135px" left="80px" />
             <AppIcon name="contact" icon="Contact" top="200px" left="20px" />
@@ -91,15 +94,9 @@ export default function Home() {
               left="-285px" 
             />
             
-            <Widget 
-              type="announcement" 
+            <MusicPlayer 
               top="15px" 
               left="-165px"
-              title="Title"
-              content={[
-                "Check out the Widgetsmith",
-                "Click to view image gallery"
-              ]} 
             />
           </div>
           
@@ -115,6 +112,7 @@ export default function Home() {
         © Clover Jam – 2025
       </div>
     </main>
+    </VolumeProvider>
   )
 }
 

@@ -1,0 +1,94 @@
+.taskbar-volume-control {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 120px;
+  background-color: var(--light-cream);
+  border-radius: 5px;
+  padding: 12px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.2s ease-out, popInUp 0.3s ease-out;
+}
+
+.taskbar-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  left: -13px;
+  top: 83px;
+  width: 100px;
+  height: 4px;
+  background: var(--middle-tone);
+  transform: rotate(-90deg) translateY(32px);
+  transform-origin: left center;
+  cursor: pointer;
+}
+
+.taskbar-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-color);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.taskbar-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.taskbar-volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-color);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.taskbar-volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Volume Message Bubble */
+.volume-message {
+  position: absolute;
+  top: -60px;
+  left: 147px;
+  width: 320px;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeInUp 0.3s ease-out, fadeOut 0.3s ease-out 3.7s forwards;
+}
+
+.message-bubble {
+  background-color: var(--light-cream);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 180px;
+}
+
+.message-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--light-cream);
+}
+
+.message-bubble p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-color);
+  text-align: center;
+}

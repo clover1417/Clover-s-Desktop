@@ -1,0 +1,22 @@
+:root {
+    /* Palette */
+    --white:            #FFFFFF;
+    --dark-cream:       #E6C9C9;
+    --middle-tone:      #F5DEDE;
+    --light-cream:      #FDEFEF;
+    --transparent-tone: #D9D9D9;
+  
+    /* Colors */
+    --background-color: var(--dark-cream);
+    --pattern-color:    var(--light-cream);
+    --inner-color:      var(--middle-tone);
+    --window-color:     var(--white);
+    --text-color:       #8C7D7D;
+    --border-color:     rgb(194, 165, 165);
+    --grid-color:       rgba(255,255,255,0.3);
+    --shadow-color:     rgba(0,0,0,0.2);
+  
+    /* Shadows */
+    --shadow: 0 4px 4px var(--shadow-color);
+    --soft-shadow: 0 2px 2px var(--shadow-color);
+}

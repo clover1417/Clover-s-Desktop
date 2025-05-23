@@ -7,11 +7,11 @@ export interface GalleryImage {
 // Collection of Widgetsmith gallery images
 export const widgetsmithGallery: GalleryImage[] = [
   {
-    src: "/images/widgetsmith/ShizukaChan.jpg",
+    src: "/widgetsmith/ShizukaChan.jpg",
     name: "静かちゃんは本当可愛い❤️🥹！！"
   },
   {
-    src: "/images/widgetsmith/ShizukaChan2.jpg",
+    src: "/widgetsmith/ShizukaChan2.jpg",
     name: "見よ！静かちゃんだた😋"
   },
 ];

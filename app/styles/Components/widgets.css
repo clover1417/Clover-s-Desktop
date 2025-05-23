@@ -1,0 +1,100 @@
+.widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.1s ease;
+}
+
+.widget:hover {
+  transform: scale(1.05);
+}
+
+.widget-outer {
+  background-color: var(--light-cream);
+  border-radius: 8.6px;
+  box-shadow: 0 3.5px 3.5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  margin-bottom: 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget.wigetsmith .widget-outer {
+  width: 109.5px;
+  height: 129.6px;
+}
+
+.widget.music-player .widget-outer {
+  width: 151.9px;
+  height: 170px;
+}
+
+.widget-inner {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding-bottom: 6px;
+  background-color: var(--middle-tone);
+  border-radius: 6.9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.widget.wigetsmith .widget-inner {
+  width: 97.4px;
+  height: 97.5px;
+  justify-content: center;
+}
+
+.widget.music-player .widget-inner {
+  width: 139.8px;
+  height: 138px;
+  justify-content: flex-start;
+  padding-top: 5px;
+}
+
+.widget-image {
+  width: 81.1px;
+  height: 81.1px;
+  overflow: hidden;
+  border-radius: 5.2px;
+  position: relative;
+}
+
+.widget-image.transitioning .image-exit {
+  animation: widgetSlideOut 0.3s forwards;
+}
+
+.widget-image .image-enter {
+  animation: widgetSlideIn 0.3s forwards;
+}
+
+.widget-image img {
+  transition: transform 0.2s ease;
+}
+
+.widget-image:hover img {
+  transform: scale(1.05);
+}
+
+.widget-label {
+  color: var(--text-color);
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+}
+
+.widget-image.transitioning .image-exit {
+  animation: widgetSlideOut 0.3s forwards;
+}
+
+.widget-image .image-enter {
+  animation: widgetSlideIn 0.3s forwards;
+}

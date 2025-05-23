@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
 // Dynamically import windows with no SSR to avoid hydration issues
@@ -20,6 +21,7 @@ interface AppIconProps {
 }
 
 export function AppIcon({ name, icon, top, left, onClick }: AppIconProps) {
+  const router = useRouter();
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isStuffOpen, setIsStuffOpen] = useState(false);
@@ -33,20 +35,25 @@ export function AppIcon({ name, icon, top, left, onClick }: AppIconProps) {
   };
 
   const handleClick = () => {
+    // Route to separate pages for works and wiki
+    if (name === 'works') {
+      router.push('/works');
+      return; // Add return to prevent further execution
+    } else if (name === 'wiki') {
+      router.push('/wiki');
+      return; // Add return to prevent further execution
+    }
+    
+    // Toggle windows for other apps
     if (name === 'about') {
-      // Toggle the About window state
       setIsAboutOpen(prev => !prev);
     } else if (name === 'gallery') {
-      // Toggle the Gallery window state
       setIsGalleryOpen(prev => !prev);
     } else if (name === 'stuff') {
-      // Toggle the Stuff window state
       setIsStuffOpen(prev => !prev);
     } else if (name === 'contact') {
-      // Toggle the Contact window state
       setIsContactOpen(prev => !prev);
     } else if (name === 'patreon') {
-      // Toggle the Patreon window state
       setIsPatreonOpen(prev => !prev);
     } else if (onClick) {
       onClick();
@@ -104,4 +111,4 @@ export function AppIcon({ name, icon, top, left, onClick }: AppIconProps) {
       {name === 'patreon' && <PatreonWindow isOpen={isPatreonOpen} onClose={closePatreon} />}
     </>
   );
-} 
+}

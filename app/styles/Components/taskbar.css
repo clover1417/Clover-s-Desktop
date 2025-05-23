@@ -1,0 +1,64 @@
+.taskbar {
+  position: absolute;
+  bottom: 5px;
+  left: 10px;
+  width: 732px;
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.return-button {
+  margin-left: 4px;
+  width: 21.6px;
+  height: 21.6px;
+  transition: transform 0.1s ease;
+}
+
+.return-button:hover {
+  transform: scale(1.2);
+}
+
+.taskbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.speaker-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18.1px;
+  height: 18.1px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.speaker-icon:hover {
+  transform: scale(1.2);
+}
+
+.time-info {
+  text-align: right;
+  margin-right: 10px;
+  position: relative;
+}
+
+.time {
+  color: var(--text-color);
+  font-size: 14px;
+  margin: 0;
+}
+
+.date {
+  color: var(--text-color);
+  font-size: 14px;
+  margin: 0;
+  position: relative;
+  top: -3px;
+  user-select: none;
+  font-family: var(--font-itim);
+}

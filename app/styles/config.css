@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+button { user-select: none; }
+img { user-select: none; }
+
+.about-tab-title,
+.about-tab-bullet,
+.modal-title,
+.modal-message,
+.modal-destination,
+.about-window-description,
+.about-window-name,
+.about-window-japanese-name,
+.about-window-greeting,
+.about-tab-bullets,
+.about-tab,
+.username-text
+{
+  user-select: text;
+}

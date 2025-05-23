@@ -31,6 +31,12 @@ export function QuickAccess({ top, left }: QuickAccessProps) {
     }
   };
 
+  const handleRandomRotation = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Generate random rotation between -15 and 15 degrees
+    const randomRotation = Math.floor(Math.random() * 31) - 15;
+    e.currentTarget.style.setProperty('--random-rotation', `${randomRotation}deg`);
+  };
+
   // Handle icon click with tracking
   const handleIconClick = useCallback((buttonId: string, link: string, title: string) => {
     if (!isClickable) return;
@@ -135,6 +141,7 @@ export function QuickAccess({ top, left }: QuickAccessProps) {
         <div 
           className={`quick-access-item ${!isClickable ? 'disabled' : ''}`}
           onClick={handleYouTubeClick}
+          onMouseEnter={handleRandomRotation}
           title="Visit YouTube Channel"
           style={{ pointerEvents: isClickable ? 'auto' : 'none' }}
         >
@@ -152,6 +159,7 @@ export function QuickAccess({ top, left }: QuickAccessProps) {
         <div 
           className={`quick-access-item ${!isClickable ? 'disabled' : ''}`}
           onClick={handleDiscordClick}
+          onMouseEnter={handleRandomRotation}
           title="Join Discord Server"
           style={{ pointerEvents: isClickable ? 'auto' : 'none' }}
         >

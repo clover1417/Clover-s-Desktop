@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { ImageViewer } from './ImageViewer';
-import { widgetsmithGallery, getRandomGalleryImage, findGalleryImageIndex } from '../utils/galleryImages';
+import { ImageViewer } from '../ImageViewer';
+import { widgetsmithGallery, getRandomGalleryImage, findGalleryImageIndex } from '../../data/widgetsmith';
+import { createPortal } from 'react-dom';
 
 interface WidgetProps {
   type: 'wigetsmith' | 'announcement';
@@ -41,12 +42,64 @@ export function Widget({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const rotationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(0);
+  const isWidgetMountedRef = useRef(true);
+  // Create a unique ID for this widget instance to prevent conflicts
+  const uniqueId = useRef(`widget-${Date.now()}-${Math.floor(Math.random() * 10000)}`).current;
+  const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const finishTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Add a ref to track if the widget is actively showing an ImageViewer
+  const isViewerActiveRef = useRef(false);
+
+  // Careful cleanup of rotation timer
+  const cleanupRotationTimer = () => {
+    if (rotationTimerRef.current) {
+      clearInterval(rotationTimerRef.current);
+      rotationTimerRef.current = null;
+    }
+  };
+
+  // Careful cleanup of transition timers
+  const cleanupTransitionTimers = () => {
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
+    if (finishTimerRef.current) {
+      clearTimeout(finishTimerRef.current);
+      finishTimerRef.current = null;
+    }
+  };
+
+  // Make sure we clean up all resources on unmount
+  useEffect(() => {
+    isWidgetMountedRef.current = true;
+    
+    return () => {
+      isWidgetMountedRef.current = false;
+      cleanupRotationTimer();
+      cleanupTransitionTimers();
+      
+      // Ensure the image viewer is closed if the widget is unmounted
+      if (isImageViewerOpen) {
+        setIsImageViewerOpen(false);
+      }
+    };
+  }, [isImageViewerOpen]);
 
   // Auto rotate images every 10 seconds
   useEffect(() => {
+    // Clean up any existing timer first
+    cleanupRotationTimer();
+    
     if (type === 'wigetsmith' && !isImageViewerOpen) {
       // Set up the rotation timer
       rotationTimerRef.current = setInterval(() => {
+        // Skip if the widget is not mounted anymore
+        if (!isWidgetMountedRef.current) {
+          cleanupRotationTimer();
+          return;
+        }
+        
         // Get next image index
         const nextIndex = (currentIndexRef.current + 1) % widgetsmithGallery.length;
         currentIndexRef.current = nextIndex;
@@ -55,26 +108,29 @@ export function Widget({
         setIsTransitioning(true);
         
         // Change the image after transition out
-        setTimeout(() => {
+        cleanupTransitionTimers();
+        transitionTimerRef.current = setTimeout(() => {
+          if (!isWidgetMountedRef.current) return;
+          
           setCurrentImage({
             src: widgetsmithGallery[nextIndex].src,
             name: widgetsmithGallery[nextIndex].name
           });
           
           // Remove transitioning class after image change
-          setTimeout(() => {
+          finishTimerRef.current = setTimeout(() => {
+            if (!isWidgetMountedRef.current) return;
             setIsTransitioning(false);
           }, 300);
+          
         }, 300);
       }, 10000); // 10 seconds
     }
     
     // Cleanup on unmount or when viewer opens
     return () => {
-      if (rotationTimerRef.current) {
-        clearInterval(rotationTimerRef.current);
-        rotationTimerRef.current = null;
-      }
+      cleanupRotationTimer();
+      cleanupTransitionTimers();
     };
   }, [type, isImageViewerOpen]);
 
@@ -83,31 +139,44 @@ export function Widget({
     if (type === 'wigetsmith') {
       currentIndexRef.current = findGalleryImageIndex(currentImage.src);
     }
-  }, []);
+  }, [type, currentImage.src]);
 
-  const handleWidgetClick = () => {
+  // Simplify widget-imageviewer interaction
+  const handleWidgetClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event from bubbling up
+    
     if (type === 'wigetsmith') {
-      console.log("Opening viewer with image:", currentImage.src);
-      setIsImageViewerOpen(true);
-      
       // Clear rotation timer when gallery opens
-      if (rotationTimerRef.current) {
-        clearInterval(rotationTimerRef.current);
-        rotationTimerRef.current = null;
-      }
+      cleanupRotationTimer();
+      
+      // Simply open the image viewer
+      setIsImageViewerOpen(true);
     }
   };
 
+  // Simplified close handler
   const handleCloseViewer = () => {
-    console.log("Closing viewer");
+    // Simply update state to hide viewer
     setIsImageViewerOpen(false);
+    
+    // Update currentIndexRef
+    if (type === 'wigetsmith') {
+      currentIndexRef.current = findGalleryImageIndex(currentImage.src);
+    }
   };
 
   // Find the correct index for the current image
   const getInitialIndex = () => {
-    const index = findGalleryImageIndex(currentImage.src);
-    console.log("Initial index:", index, "for src:", currentImage.src);
-    return index;
+    return findGalleryImageIndex(currentImage.src);
+  };
+
+  // Prepare a proper copy of the gallery data to avoid reference issues
+  const getGalleryData = () => {
+    return widgetsmithGallery.map(img => ({
+      src: img.src,
+      name: img.name
+    }));
   };
 
   return (
@@ -137,40 +206,18 @@ export function Widget({
               <p className="widget-label">Widgetsmith</p>
             </>
           )}
-          
-          {type === 'announcement' && (
-            <>
-              <div className="widget-inner">
-                <p className="widget-title">{title || 'Title'}</p>
-                <div className="widget-dividers">
-                  <div className="divider" />
-                  <div className="divider" />
-                  <div className="divider" />
-                </div>
-                <div className="widget-content">
-                  {content?.map((line, index) => (
-                    <p key={index} className="content-line">{line}</p>
-                  )) || (
-                    <>
-                      <p className="content-line">TestTestTestTestTest</p>
-                      <p className="content-line">TestTestTestTestTest</p>
-                    </>
-                  )}
-                </div>
-              </div>
-              <p className="widget-label">Announcement</p>
-            </>
-          )}
         </div>
       </div>
 
-      {isImageViewerOpen && (
+      {/* Only create portal when actually needed */}
+      {isImageViewerOpen && typeof document !== 'undefined' && createPortal(
         <ImageViewer 
           isOpen={isImageViewerOpen}
           onClose={handleCloseViewer}
-          images={widgetsmithGallery}
+          images={getGalleryData()}
           initialIndex={getInitialIndex()}
-        />
+        />,
+        document.body
       )}
     </>
   );

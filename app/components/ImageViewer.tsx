@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { bringToFront, sendToBack, getZIndex, registerWindow } from '../utils/windowManager';
 
 interface ImageViewerProps {
   isOpen: boolean;
@@ -23,7 +24,30 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [isClosing, setIsClosing] = useState(false);
+  const [zIndex, setZIndex] = useState(1);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Store reference to the close function to avoid stale closures
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+  
+  // Reset position and scale
+  const resetState = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+    console.log('ImageViewer state reset');
+  };
+  
+  // Register window callbacks
+  useEffect(() => {
+    registerWindow('imageViewer', {
+      onClose: () => onCloseRef.current(),
+      onReset: resetState
+    });
+  }, []);
 
   // Handle client-side mounting
   useEffect(() => {
@@ -39,6 +63,9 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
       setIsImageLoaded(false);
       setIsFirstLoad(true);
       document.body.style.overflow = 'hidden';
+      
+      // Bring to front when opened
+      setZIndex(bringToFront('imageViewer'));
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -56,26 +83,39 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
     }
   }, [isOpen, initialIndex, images.length]);
 
+  // Add a side effect to listen for external z-index changes
+  useEffect(() => {
+    const updateZIndexInterval = setInterval(() => {
+      if (isOpen) {
+        const newZIndex = getZIndex('imageViewer');
+        if (newZIndex !== zIndex) {
+          setZIndex(newZIndex);
+        }
+      }
+    }, 100); // Check every 100ms
+    
+    return () => clearInterval(updateZIndexInterval);
+  }, [isOpen, zIndex]);
+
   const handlePrevImage = () => {
     if (currentIndex > 0 && !isTransitioning) {
       // Start transition animation
       setIsTransitioning(true);
       setSlideDirection('right');
       
-      // Reset position and scale for clean transitions
-      setPosition({ x: 0, y: 0 });
-      setScale(1);
+      // Don't reset position and scale for transitions
+      // Keep current zoom and position
       
-      // Change the image after transition out
+      // Change the image after transition out - faster transition
       setTimeout(() => {
         setCurrentIndex(prev => prev - 1);
         
-        // Remove transitioning class after image change
+        // Remove transitioning class after image change - faster transition
         setTimeout(() => {
           setIsTransitioning(false);
           setSlideDirection(null);
-        }, 300);
-      }, 300);
+        }, 150);
+      }, 150);
     }
   };
 
@@ -85,20 +125,19 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
       setIsTransitioning(true);
       setSlideDirection('left');
       
-      // Reset position and scale for clean transitions
-      setPosition({ x: 0, y: 0 });
-      setScale(1);
+      // Don't reset position and scale for transitions
+      // Keep current zoom and position
       
-      // Change the image after transition out
+      // Change the image after transition out - faster transition
       setTimeout(() => {
         setCurrentIndex(prev => prev + 1);
         
-        // Remove transitioning class after image change
+        // Remove transitioning class after image change - faster transition
         setTimeout(() => {
           setIsTransitioning(false);
           setSlideDirection(null);
-        }, 300);
-      }, 300);
+        }, 150);
+      }, 150);
     }
   };
 
@@ -107,21 +146,21 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
       // Start transition animation
       setIsTransitioning(true);
       setSlideDirection(index > currentIndex ? 'left' : 'right');
+      console.log(index, currentIndex);
       
-      // Reset position and scale for clean transitions
-      setPosition({ x: 0, y: 0 });
-      setScale(1);
+      // Don't reset position and scale for transitions
+      // Keep current zoom and position
       
-      // Change the image after transition out
+      // Change the image after transition out - faster transition
       setTimeout(() => {
         setCurrentIndex(index);
         
-        // Remove transitioning class after image change
+        // Remove transitioning class after image change - faster transition
         setTimeout(() => {
           setIsTransitioning(false);
           setSlideDirection(null);
-        }, 300);
-      }, 300);
+        }, 150);
+      }, 150);
     }
   };
 
@@ -138,6 +177,10 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent default behavior
+    
+    // Bring viewer to front when interacted with
+    setZIndex(bringToFront('imageViewer'));
+    
     // Allow dragging regardless of zoom level
     setIsDragging(true);
     setStartPos({
@@ -195,6 +238,15 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
     }
   }, [isOpen]);
 
+  // Handle close with animation
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 200); // Slightly longer than animation for smooth exit
+  };
+
   // Don't render if not mounted or not open
   if (!mounted || !isOpen) return null;
 
@@ -221,27 +273,21 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
       };
     }
     
-    // When dragging or zooming
-    if (!isTransitioning) {
-      return {
-        transform: `translate(-50%, -50%) scale(${scale})`,
-        translate: `${position.x}px ${position.y}px`,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isImageLoaded ? 1 : 0,
-        transition: isImageLoaded ? 'opacity 0.3s ease-in-out' : 'none'
-      };
-    }
-    
-    // During transitions, only apply basic centered positioning
+    // When dragging, zooming, or transitioning - maintain position and scale
     return {
-      transform: 'translate(-50%, -50%)',
-      cursor: 'grab',
-      opacity: isImageLoaded ? 1 : 0
+      transform: `translate(-50%, -50%) scale(${scale})`,
+      translate: `${position.x}px ${position.y}px`,
+      cursor: isDragging ? 'grabbing' : 'grab',
+      opacity: isImageLoaded ? 1 : 0,
+      transition: isImageLoaded ? 'opacity 0.15s ease-in-out' : 'none'
     };
   };
 
   const viewerContent = (
-    <div className="image-viewer-overlay">
+    <div 
+      className={`image-viewer-overlay ${isClosing ? 'closing' : ''}`}
+      style={{ zIndex: zIndex }}
+    >
       <div className="image-viewer-container" onClick={(e) => e.stopPropagation()}>
         {/* Left Navigation Arrow */}
         {safeIndex > 0 && (
@@ -257,11 +303,11 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
         {/* Image Container */}
         <div 
           className="image-viewer-content-wrapper"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <div 
             ref={contentRef}
-            className={`image-viewer-content ${isFirstLoad ? 'initial-load' : ''}`}
+            className={`image-viewer-content ${isFirstLoad ? 'initial-load' : ''} ${isClosing ? 'closing' : ''}`}
             style={getTransformStyle()}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -323,7 +369,7 @@ export function ImageViewer({ isOpen, onClose, images, initialIndex = 0 }: Image
         {/* Close Button */}
         <button 
           className="image-viewer-close-btn"
-          onClick={onClose}
+          onClick={handleClose}
         >
           Leave
         </button>
