@@ -18,6 +18,8 @@ import './styles/Widgets/musicPlayer.css';
 import './styles/Applications/about.css';
 import './styles/Applications/gallery.css';
 import './styles/Applications/stuff.css';
+import './styles/Applications/works.css';
+import './styles/Applications/wiki.css';
 
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from "next/font/google";

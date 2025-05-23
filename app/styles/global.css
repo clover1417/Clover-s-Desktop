@@ -9,7 +9,7 @@
     /* Colors */
     --background-color: var(--dark-cream);
     --pattern-color:    var(--light-cream);
-    --inner-color:      var(--middle-tone);
+    --inner-color:      var(--light-cream);
     --window-color:     var(--white);
     --text-color:       #8C7D7D;
     --border-color:     rgb(194, 165, 165);

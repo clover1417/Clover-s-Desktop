@@ -10,6 +10,19 @@ export interface WikiSubsection {
   id: string;
   title: string;
   content: string;
+  details?: TeamMemberDetails | PartnerDetails;
+}
+
+export interface TeamMemberDetails {
+  type: 'team';
+  avatar: string;
+  skills: string[];
+  experience: string;
+}
+
+export interface PartnerDetails {
+  type: 'partner';
+  avatar: string;
 }
 
 export const wikiCategories = [
@@ -18,8 +31,6 @@ export const wikiCategories = [
   'Projects',
   'Partners',
   'Values',
-  'Resources',
-  'Contact'
 ];
 
 export const wikiData: WikiSection[] = [
@@ -27,24 +38,22 @@ export const wikiData: WikiSection[] = [
     id: 'about',
     title: 'About Slime Island',
     icon: '/assets/wiki/about-icon.png',
-    content: `Slime Island is a creative studio founded in 2022, focused on producing innovative digital experiences across multiple disciplines. Our work spans from game development to digital art, animation, and interactive media.
-
-The studio draws inspiration from playful aesthetics and combines them with professional execution, creating a unique blend of fun and functionality in all our projects.`,
+    content: `Slime Island is a creative collective founded in 2022, built as a community where developers, artists, and storytellers learn and grow together. Rather than a traditional studio, it operates as a cooperative platform—focused on shared creation, mutual growth, and collaborative projects. Our work spans Roblox game development, digital art, media, storytelling, and soon, animation and film.`,
     subsections: [
       {
         id: 'mission',
         title: 'Our Mission',
-        content: "To create delightful digital experiences that inspire creativity and joy while pushing the boundaries of what's possible in interactive media."
+        content: "To create innovative, emotionally engaging digital experiences through community-driven collaboration—where every member contributes not just to projects, but to the growth of the group itself."
       },
       {
         id: 'vision',
         title: 'Our Vision',
-        content: "To become a recognized creative force in the digital space, known for our distinctive aesthetic and innovative approach to design and development."
+        content: "We aim to become a recognized space for original, high-quality digital content—from games to cinematic media—powered by a passionate team and fueled by creative freedom and long-term growth."
       },
       {
         id: 'history',
         title: 'History',
-        content: "Slime Island began as a solo project by Clover, eventually growing into a collaborative studio bringing together talented individuals from diverse creative backgrounds."
+        content: "Founded in 2022, Slime Island began as a small group of like-minded creators passionate about interactive media and visual storytelling. What started as casual experimentation has grown into a collective committed to crafting impactful digital works and building a sustainable future together."
       }
     ]
   },
@@ -57,17 +66,46 @@ The studio draws inspiration from playful aesthetics and combines them with prof
       {
         id: 'clover',
         title: 'Clover',
-        content: 'Founder & Creative Director. Specializes in programming, UI/UX design, and creative direction.'
+        content: 'Founder & Creative Director. A seasoned Roblox developer with 5+ years of experience in LuaU scripting, 3D/2D design, UI/UX, animation, and rendering. Also skilled in video editing, storytelling, and project management. Currently exploring music and language to broaden creative direction.',
+        details: {
+          type: 'team',
+          avatar: '/assets/CloverAvater.jpg',
+          skills: ['All Fields', 'Multitasking', 'Creative Direction', 'Project Management'],
+          experience: '5+ years in creative technology and digital design'
+        }
       },
       {
-        id: 'team-member-2',
-        title: 'Team Member 2',
-        content: '3D Artist & Animator. Creates detailed 3D models and brings them to life through animation.'
+        id: 'tofu',
+        title: 'Tofu Axolotlbark',
+        content: 'Programming & Character Design. With over two years of experience in programming and storytelling, Tofu brings a creative and technical perspective to our projects. Their expertise encompasses a range of skills crucial to game development, including Programming, Storytelling, Concept Creative, and Character Design.',
+        details: {
+          type: 'team',
+          avatar: '/wiki/Team/Boykisser.png',
+          skills: ['Programming', 'Storytelling', 'Concept Creative', 'Character Design'],
+          experience: '2+ years in programming and storytelling'
+        }
       },
       {
-        id: 'team-member-3',
-        title: 'Team Member 3',
-        content: 'Visual Effects Artist. Crafts stunning visual effects that enhance projects with magic and wonder.'
+        id: 'sigma',
+        title: 'Sigma',
+        content: '3D environment artist. Crafts stunning 3D environments that enhance projects with magic and wonder.',
+        details: {
+          type: 'team',
+          avatar: '/wiki/Team/Sigma.webp',
+          skills: ['3D Environment', '3D Modeling', '3D Texturing', '3D Lighting'],
+          experience: '3+ years in 3D environment design'
+        }
+      },
+      {
+        id: 'binTuanAnh',
+        title: 'Bin Tuấn Anh',
+        content: '3D environment artist. Crafts stunning 3D environments that enhance projects with magic and wonder.',
+        details: {
+          type: 'team',
+          avatar: '/wiki/Team/BinTuanAnh.png',
+          skills: ['3D Design', 'Workspace Composition', 'Asset Creation', 'Lighting Techniques'],
+          experience: '6+ years in 3D overview design'
+        }
       }
     ]
   },
@@ -79,19 +117,15 @@ The studio draws inspiration from playful aesthetics and combines them with prof
     subsections: [
       {
         id: 'project-1',
-        title: 'Project Alpha',
-        content: 'An interactive experience blending 3D environments with playful mechanics.'
+        title: 'Reverie Roblox',
+        content: 'Ascend Mount Everest as an adventurer tasked with uncovering lost documents within an abandoned research facility. But be warned, the secrets you unearth may be more terrifying than the climb. Dare to explore and lose yourself in its mysterious worlds and haunting stories beneath dreams and reality.'
       },
       {
         id: 'project-2',
-        title: 'Project Beta',
-        content: 'A mobile application featuring unique visual design and intuitive user experience.'
+        title: 'Scientists Adventure',
+        content: `Scientists' Adventure" is a genre-bending animated series following the inventive Sie and the resourceful Clover. From their unique Slime Island laboratory, they embark on dynamic multiverse travels. Expect a blend of sci-fi challenges, comedic situations, and hints of romance as they encounter diverse worlds. Featuring a large ensemble of scientific colleagues, interdimensional allies, and numerous robots, this series delivers a continuous stream of travel, fantasy, humor, and thrills.`
       },
-      {
-        id: 'project-3',
-        title: 'Project Gamma',
-        content: 'An animated short film exploring themes of creativity and imagination.'
-      }
+
     ]
   },
   {
@@ -100,28 +134,14 @@ The studio draws inspiration from playful aesthetics and combines them with prof
     icon: '/assets/wiki/partners-icon.png',
     content: 'We collaborate with like-minded creators and organizations to bring creative visions to life.',
     subsections: [
-      {
-        id: 'partner-1',
-        title: 'Partner Studio A',
-        content: "A game development studio with whom we've collaborated on interactive projects."
-      },
-      {
-        id: 'partner-2',
-        title: 'Partner Agency B',
-        content: "A digital agency specializing in web development and brand identity."
-      },
-      {
-        id: 'partner-3',
-        title: 'Independent Creator C',
-        content: "An independent artist with whom we've collaborated on visual storytelling projects."
-      }
+      
     ]
   },
   {
     id: 'values',
     title: 'Values',
     icon: '/assets/wiki/values-icon.png',
-    content: 'The core principles that guide our work and creative process.',
+    content: 'At Slime Island, we value creativity, collaboration, and growth. We believe in learning by doing, supporting each other, and building meaningful experiences through shared passion. Every project is a step forward—both for the group and each individual.',
     subsections: [
       {
         id: 'creativity',
@@ -141,6 +161,19 @@ The studio draws inspiration from playful aesthetics and combines them with prof
     ]
   }
 ];
+
+// Helper functions for accessing team and partner data
+export const getTeamMemberDetails = (memberId: string): TeamMemberDetails | undefined => {
+  const teamSection = wikiData.find(section => section.id === 'team');
+  const memberSubsection = teamSection?.subsections?.find(sub => sub.id === memberId);
+  return memberSubsection?.details as TeamMemberDetails | undefined;
+};
+
+export const getPartnerDetails = (partnerId: string): PartnerDetails | undefined => {
+  const partnersSection = wikiData.find(section => section.id === 'partners');
+  const partnerSubsection = partnersSection?.subsections?.find(sub => sub.id === partnerId);
+  return partnerSubsection?.details as PartnerDetails | undefined;
+};
 
 export const getWikiSectionById = (id: string): WikiSection | undefined => {
   return wikiData.find(section => section.id === id);
